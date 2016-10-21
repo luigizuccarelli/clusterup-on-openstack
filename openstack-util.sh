@@ -3,11 +3,11 @@
 # @(#)$Id$
 #
 # Utility to create/delete instances on OpenStack
-# 
-# The following are set as default 
-# - flavor m1.large 
+#
+# The following are set as default
+# - flavor m1.large
 # - image  rhel-guest-image-7.2
-# 
+#
 
 # for reference - list of flavors
 # m1.miq
@@ -27,13 +27,13 @@
 # t2.micro
 # t2.small
 
-# for a list of images use 
+# for a list of images use
 
 clear
 
 cmds=( create useRc sshUtil )
 
-# define convenience functions 
+# define convenience functions
 function updateTime() {
   TIME=$(date +%T)
   NOW="\033[0;96m[ $(date +%Y-%m-%d) ${TIME} ]\033[0m"
@@ -44,7 +44,7 @@ function updateTime() {
 
 KEYPAIR=osev33
 SECGROUP=os3
-SERVER_NAME=ose33-cup
+SERVER_NAME=$OS_SERVER_NAME
 RHEL_IMAGE=rhel-guest-image-7.2
 FLAVOR=m1.large
 AWS_HOSTED_ZONE_ID=ZO6D3A8PU8EUH
@@ -54,8 +54,8 @@ DNS_NODE=node1-osev31
 function usage() {
   echo -e "${INFO} Usage \n"
   echo -e "        \033[0;93m./openstack-util.sh create\033[0m"
-  echo " " 
-} 
+  echo " "
+}
 
 function create() {
 
@@ -83,7 +83,7 @@ function create() {
   echo -e " "
 
   read -p "        Continue (y/n)?" choice
-  case "$choice" in 
+  case "$choice" in
     y|Y ) echo " ";;
     n|N ) exit 0; echo " ";;
     * ) echo "invalid";;
@@ -115,13 +115,13 @@ function create() {
   image=$(openstack image list --private | grep ${RHEL_IMAGE} | awk '{print $2}')
   flavor=$(openstack flavor list --private | grep m1.large | grep -v ephemeral | grep -v qeos | awk '{print $2}')
 
-  if [ -z "$image" ] 
+  if [ -z "$image" ]
   then
     echo -e "${ERROR} Image not found '${RHEL_IMAGE}'"
     exit 1
   fi
 
-  if [ -z "$flavor" ] 
+  if [ -z "$flavor" ]
   then
     echo -e "${ERROR} Flavor not found '${m1.large}'"
     exit 1
@@ -156,13 +156,13 @@ function create() {
   # update the remote-command script with the newly obtained floating-ip
   sudo sed -i -e "s|# VIRTUAL_INTERFACE_IP=|VIRTUAL_INTERFACE_IP=$floating_ip|" remote-command.sh
 
-  # execute the script remotely 
-  ssh -tt cloud-user@$floating_ip sudo /home/cloud-user/remote-command.sh 
+  # execute the script remotely
+  ssh -tt cloud-user@$floating_ip sudo /home/cloud-user/remote-command.sh
 
 }
 
 function remove() {
-  # used for testing 
+  # used for testing
   # overides the previous set values
   if [  "$1" = "test" ]
   then
@@ -179,7 +179,7 @@ function remove() {
 }
 
 function removeKey() {
-  # used for testing 
+  # used for testing
   # overides the previous set values
   if [  "$1" = "test" ]
   then
@@ -194,7 +194,7 @@ function removeKey() {
 }
 
 function removeSecGroup() {
-  # used for testing 
+  # used for testing
   # overides the previous set values
   if [  "$1" = "test" ]
   then
@@ -271,7 +271,7 @@ else
     sshUtil)
       sshUtil
     ;;
-     
+
   esac
 
 fi
