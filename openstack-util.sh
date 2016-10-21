@@ -65,7 +65,7 @@ function create() {
   type oc >/dev/null 2>&1 || { echo -e >&2 "${ERROR} Please install the openshift client tool - https://github.com/openshift/origin/releases/download/v1.3.1/openshift-origin-client-tools-v1.3.1-dad658de7465ba8a234a4fb40b5b446a45a4cee1-linux-64bit.tar.gz\n"; exit 1; }
   type git >/dev/null 2>&1 || { echo -e >&2 "${ERROR} Please install git\n"; exit 1; }
 
-  source ./rhmobile.openrc.sh
+  source rhmobile-openrc.sh
 
   # alert before continuing
   echo -e "${INFO} The following settings are going to be used to create the new instances"
@@ -131,7 +131,7 @@ function create() {
   echo -e "${DEBUG} flavor found ${flavor}"
 
   # boot the server
-  echo -e "${INFO} Launcing the server"
+  echo -e "${INFO} Booting the server"
   openstack server create --flavor ${flavor} --image ${image} --security-group ${SECGROUP} --security-group default --key-name ${KEYPAIR} ${SERVER_NAME}
 
   # check if its up
