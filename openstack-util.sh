@@ -44,7 +44,7 @@ function updateTime() {
 
 KEYPAIR=osev33
 SECGROUP=os3
-SERVER_NAME=ose33-cup
+SERVER_NAME=$OS_SERVER_NAME
 RHEL_IMAGE=rhel-guest-image-7.2
 FLAVOR=m1.large
 AWS_HOSTED_ZONE_ID=ZO6D3A8PU8EUH
@@ -130,31 +130,43 @@ function create() {
   echo -e "${DEBUG} Image found ${image}"
   echo -e "${DEBUG} flavor found ${flavor}"
 
-  # boot the server
-  echo -e "${INFO} Booting the server"
-  openstack server create --flavor ${flavor} --image ${image} --security-group ${SECGROUP} --security-group default --key-name ${KEYPAIR} ${SERVER_NAME}
 
   # check if its up
-  server_id=$(openstack server list | grep ${SERVER_NAME} | awk '{ print $1 }')
+  server_id=$(openstack server list | grep ${SERVER_NAME} | awk '{ print $2 }')
+  if [ -z "$server_id" ]
+  then
+    # boot the server
+    echo -e "${INFO} Booting the server"
+    openstack server create --flavor ${flavor} --image ${image} --security-group ${SECGROUP} --security-group default --key-name ${KEYPAIR} ${SERVER_NAME}
 
-  # find floating ip
-  floating_ip=$(openstack floating ip list | grep None | awk '{ print $4 }')
+    # check if its up
+    server_id=$(openstack server list | grep ${SERVER_NAME} | awk '{ print $2 }')
 
-  #TODO add a step to create floating ip if it doesn't exist
+    # find floating ip
+    floating_ip=$(openstack floating ip list | grep None | awk '{ print $4 }' | head -n 1)
 
-  # link it
-  openstack server add floating ip $server_id $floating_ip
+    if [ -z "$flaoting_ip" ]
+    then
+      openstack floating ip create '10.8.172.0/22'
+      floating_ip=$(openstack floating ip list | grep None | awk '{ print $4 }' | head -n 1)
+    fi
+  
+    echo -e "${DEBUG} Server ID ${server_id}"
+    echo -e "${DEBUG} Floating IP ${floating_ip}"
+
+    # link it
+    openstack server add floating ip $server_id $floating_ip
+  else
+    floating_ip=$(openstack server show ose33-cup | grep addresses | awk '{ print $5}')
+  fi
+  
+  # update the remote-command script with the newly obtained floating-ip
+  sed -i -e "s|# VIRTUAL_INTERFACE_IP=|VIRTUAL_INTERFACE_IP=$floating_ip|" remote-command.sh
 
   # copy prerequisite
   scp remote-command.sh cloud-user@$floating_ip:/home/cloud-user
-  scp pvs-remplate.yaml cloud-user@$floating_ip:/home/cloud-user
+  scp pvs-template.json cloud-user@$floating_ip:/home/cloud-user
 
-  # before launching the remote script get the latest version of the core templates
-  # and install on the openstack remote server
-  ssh -tt cloud-user@$floating_ip git clone https://github.com/fheng/fh-core-openshift-templates
-
-  # update the remote-command script with the newly obtained floating-ip
-  sudo sed -i -e "s|# VIRTUAL_INTERFACE_IP=|VIRTUAL_INTERFACE_IP=$floating_ip|" remote-command.sh
 
   # execute the script remotely 
   ssh -tt cloud-user@$floating_ip sudo /home/cloud-user/remote-command.sh 

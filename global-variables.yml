@@ -1,0 +1,19 @@
+# change this according to system you are using
+# beaker
+#ansible_ssh_user: root
+# OpenStack
+ansible_ssh_user: cloud-user
+
+# true: install released (GA) OSE3 version from the official channel
+# false: install latest (pre-released) OSE3 version from puddle
+install_released_ose: true
+
+# true: use Docker registry with released images (ie. registry.access.redhat.com)
+# false: use pre-release Docker registry
+use_released_registry: true
+
+ose_domain: ose3-os1internal-01.skunkhenry.com 
+ose_apps: cloudapps
+
+ose_installer_uri: https://github.com/openshift/openshift-ansible.git
+ose_installer_branch: master
