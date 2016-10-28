@@ -11,7 +11,7 @@ and then deploy and launch the oc cluster up with fh-core components
  export OPENSTACK_SERVER_NAME="MyCustomValue"
  ```
  
- * Install OpenStack Client Tools
+* Install OpenStack Client Tools
  
  _ Install for Mac OS X_
  
@@ -21,7 +21,7 @@ and then deploy and launch the oc cluster up with fh-core components
  pip install --upgrade python-openstackclient
  ```
  
- ## Usage
+## Usage
  
  Run the following script to create the OpenStack instance. Also remember to change the Server Name value (it must be unique)
   		  
