@@ -8,7 +8,7 @@ and then deploy and launch the oc cluster up with fh-core components
 * Export Unique Server Name
 
  ```bash
- export OPENSTACK_SERVER_NAME="MyCustomValue"
+ export OS_SERVER_NAME="MyCustomValue"
  ```
  
 * Install OpenStack Client Tools

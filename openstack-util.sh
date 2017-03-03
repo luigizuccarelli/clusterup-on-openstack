@@ -49,7 +49,7 @@ RHEL_IMAGE=rhel-guest-image-7.2
 FLAVOR=m1.large
 AWS_HOSTED_ZONE_ID=ZO6D3A8PU8EUH
 OSE_DOMAIN=cios
-DNS_NODE=node1-osev31
+DNS_NODE=NA
 
 function usage() {
   echo -e "${INFO} Usage \n"
@@ -162,6 +162,8 @@ function create() {
   
   # update the remote-command script with the newly obtained floating-ip
   sed -i -e "s|# VIRTUAL_INTERFACE_IP=|VIRTUAL_INTERFACE_IP=$floating_ip|" remote-command.sh
+
+  sleep 30;
 
   # copy prerequisite
   scp remote-command.sh cloud-user@$floating_ip:/home/cloud-user
